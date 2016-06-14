@@ -78,10 +78,6 @@ if( !client.rooms )console.log('what?', client );
                         client.broadcast.to(roomId).emit('receive', {msg: msg, user: user, img: img});  // <-- this does not work
                         break;
                     }
-                    else //try it anyway
-                    {
-                        client.broadcast.to(roomId).emit('receive', {msg: msg, user: user, img: img});
-                    }
                 }
             }
 /*
