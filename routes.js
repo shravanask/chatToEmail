@@ -102,8 +102,9 @@ if( !client.rooms )console.log('what?', client );
 		socket.on('load',function(data){
 
 			var room = findClientsSocket(io,data);
+			console.error("room load on ->", room);
 			if(room.length === 0 ) {
-
+				console.error("no one in room ->");
 				socket.emit('peopleinchat', {number: 0});
 			}
 			else if(room.length === 1) {
@@ -125,49 +126,72 @@ if( !client.rooms )console.log('what?', client );
 		// and add them to the room
 		socket.on('login', function(data) {
 
+			//console.error("data ->", data);
 			var room = findClientsSocket(io, data.id);
+
+			console.error("room login on ->", data.user);
+
+			socket.username = data.user;
+			socket.room = data.id;
+			socket.avatar = gravatar.url(data.avatar, {s: '140', r: 'x', d: 'mm'});
+
+			// Tell the person what he should use for an avatar
+			socket.emit('img', socket.avatar);
+
+
+			// Add the client to the room
+			socket.join(data.id);
+
+			chat.in(data.id).emit('startChat', {
+				boolean: true,
+				id: data.id,
+				users: ['support', data.user],
+				avatars: []
+			});
+
 			// Only two people per room are allowed
-			if (room.length < 2) {
 
-				// Use the socket object to store data. Each client gets
-				// their own unique socket object
-
-				socket.username = data.user;
-				socket.room = data.id;
-				socket.avatar = gravatar.url(data.avatar, {s: '140', r: 'x', d: 'mm'});
-
-				// Tell the person what he should use for an avatar
-				socket.emit('img', socket.avatar);
-
-
-				// Add the client to the room
-				socket.join(data.id);
-
-				if (room.length == 1) {
-
-					var usernames = [],
-						avatars = [];
-
-					usernames.push(room[0].username);
-					usernames.push(socket.username);
-
-					avatars.push(room[0].avatar);
-					avatars.push(socket.avatar);
-
-					// Send the startChat event to all the people in the
-					// room, along with a list of people that are in it.
-
-					chat.in(data.id).emit('startChat', {
-						boolean: true,
-						id: data.id,
-						users: usernames,
-						avatars: avatars
-					});
-				}
-			}
-			else {
-				socket.emit('tooMany', {boolean: true});
-			}
+			//if (room.length < 2) {
+			//
+			//	// Use the socket object to store data. Each client gets
+			//	// their own unique socket object
+			//
+			//	socket.username = data.user;
+			//	socket.room = data.id;
+			//	socket.avatar = gravatar.url(data.avatar, {s: '140', r: 'x', d: 'mm'});
+			//
+			//	// Tell the person what he should use for an avatar
+			//	socket.emit('img', socket.avatar);
+			//
+			//
+			//	// Add the client to the room
+			//	socket.join(data.id);
+			//
+			//	if (room.length == 1) {
+			//
+			//		var usernames = [],
+			//			avatars = [];
+			//
+			//		usernames.push(room[0].username);
+			//		usernames.push(socket.username);
+			//
+			//		avatars.push(room[0].avatar);
+			//		avatars.push(socket.avatar);
+			//
+			//		// Send the startChat event to all the people in the
+			//		// room, along with a list of people that are in it.
+			//
+			//		chat.in(data.id).emit('startChat', {
+			//			boolean: true,
+			//			id: data.id,
+			//			users: usernames,
+			//			avatars: avatars
+			//		});
+			//	}
+			//}
+			//else {
+			//	socket.emit('tooMany', {boolean: true});
+			//}
 		});
 
 		// Somebody left the chat
@@ -238,11 +262,15 @@ if( !client.rooms )console.log('what?', client );
 function findClientsSocket(io,roomId, namespace) {
 	var res = [],
 		ns = io.of(namespace ||"/");    // the default namespace is "/"
-
+	
 	if (ns) {
 		for (var id in ns.connected) {
 			if(roomId) {
 				var index = ns.connected[id].rooms.indexOf(roomId) ;
+				console.error("roomId ->", roomId);
+				console.error("ns.connected[id].rooms ->", ns.connected[id].rooms);
+				
+				console.error("index ->", index);
 				if(index !== -1) {
 					res.push(ns.connected[id]);
 				}

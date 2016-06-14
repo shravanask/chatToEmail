@@ -14,7 +14,7 @@
 body {
 	background-color: #f0f1f3;
 	color:#667073;
-	font: 16px/1.3 'Arial',sans-serif;
+	font: 16px/1.3 'Open Sans',sans-serif;
 }
 
 
@@ -642,4 +642,56 @@ footer {
 	width:700px;
 	margin: 0 auto 200px;
 	overflow:hidden;
+}
+
+#ask-me {
+
+}
+
+#submit {
+	border: 2px solid #e10b7d;
+	border-radius: 35px;
+	color: #e10b7d;
+	font-size: 23px;
+	padding: 10px 21px;
+	text-decoration: none;
+	font-family: 'Open Sans', sans-serif;
+	background: #fff;
+}
+
+#message {
+	border-color: #e10b7d !important;
+}
+
+.info {
+	color: #e10b7d;
+}
+
+.round.hollow {
+	position: absolute;
+	right: 10px;
+	bottom: 15px;
+	margin: 40px 0 0;
+}
+.round.hollow a {
+	border: 2px solid #e10b7d;
+	border-radius: 35px;
+	color: #e10b7d;
+	font-size: 23px;
+	padding: 10px 21px;
+	text-decoration: none;
+	font-family: 'Open Sans', sans-serif;
+}
+.round.hollow a:hover {
+	border: 2px solid #ff31a3;
+	border-radius: 35px;
+	color: #ff31a3;
+	font-size: 23px;
+	padding: 10px 21px;
+	text-decoration: none;
+}
+
+.navbar, .navbar-default {
+	background-color: #e10b7d !important;
+	border-color: #e10b7d !important;
 }

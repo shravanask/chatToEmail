@@ -58,71 +58,75 @@ $(function(){
 	// receive the names and avatars of all people in the chat room
 	socket.on('peopleinchat', function(data){
 
-		if(data.number === 0){
+		socket.emit('login', {user: "guest", avatar: "guest@guest.nl", id: id});
+		//if(data.number === 0){
+		//	showMessage("inviteSomebody");
+		//
+		//	showMessage("connected");
+		//
+		//	showMessage("personinchat",data);
+		//
+		//	loginForm.on('submit', function(e){
+		//
+		//		e.preventDefault();
+		//
+		//		name = $.trim(yourName.val());
+		//
+		//		if(name.length < 1){
+		//			alert("Please enter a nick name longer than 1 character!");
+		//			return;
+		//		}
+		//
+		//		email = yourEmail.val();
+		//
+		//		if(!isValid(email)) {
+		//			alert("Please enter a valid email!");
+		//		}
+		//		else {
+		//
+		//			showMessage("inviteSomebody");
+		//
+		//			// call the server-side function 'login' and send user's parameters
+		//			socket.emit('login', {user: name, avatar: email, id: id});
+		//		}
+		//
+		//	});
+		//}
 
-			showMessage("connected");
-
-			loginForm.on('submit', function(e){
-
-				e.preventDefault();
-
-				name = $.trim(yourName.val());
-				
-				if(name.length < 1){
-					alert("Please enter a nick name longer than 1 character!");
-					return;
-				}
-
-				email = yourEmail.val();
-
-				if(!isValid(email)) {
-					alert("Please enter a valid email!");
-				}
-				else {
-
-					showMessage("inviteSomebody");
-
-					// call the server-side function 'login' and send user's parameters
-					socket.emit('login', {user: name, avatar: email, id: id});
-				}
-			
-			});
-		}
-
-		else if(data.number === 1) {
-
-			showMessage("personinchat",data);
-
-			loginForm.on('submit', function(e){
-
-				e.preventDefault();
-
-				name = $.trim(hisName.val());
-
-				if(name.length < 1){
-					alert("Please enter a nick name longer than 1 character!");
-					return;
-				}
-
-				if(name == data.user){
-					alert("There already is a \"" + name + "\" in this room!");
-					return;
-				}
-				email = hisEmail.val();
-
-				if(!isValid(email)){
-					alert("Wrong e-mail format!");
-				}
-				else {
-					socket.emit('login', {user: name, avatar: email, id: id});
-				}
-
-			});
-		}
-
-		else {
-			showMessage("tooManyPeople");
-		}
+		//else if(data.number === 1) {
+		//
+		//	showMessage("personinchat",data);
+		//
+		//	loginForm.on('submit', function(e){
+		//
+		//		e.preventDefault();
+		//
+		//		name = $.trim(hisName.val());
+		//
+		//		if(name.length < 1){
+		//			alert("Please enter a nick name longer than 1 character!");
+		//			return;
+		//		}
+		//
+		//		if(name == data.user){
+		//			alert("There already is a \"" + name + "\" in this room!");
+		//			return;
+		//		}
+		//		email = hisEmail.val();
+		//
+		//		if(!isValid(email)){
+		//			alert("Wrong e-mail format!");
+		//		}
+		//		else {
+		//			socket.emit('login', {user: name, avatar: email, id: id});
+		//		}
+		//
+		//	});
+		//}
+		//
+		//else {
+		//	showMessage("tooManyPeople");
+		//}
 
 	});
 
