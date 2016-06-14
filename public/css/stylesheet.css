@@ -648,6 +648,25 @@ footer {
 
 }
 
+#submit {
+	border: 2px solid #e10b7d;
+	border-radius: 35px;
+	color: #e10b7d;
+	font-size: 23px;
+	padding: 10px 21px;
+	text-decoration: none;
+	font-family: 'Open Sans', sans-serif;
+	background: #fff;
+}
+
+#message {
+	border-color: #e10b7d !important;
+}
+
+.info {
+	color: #e10b7d;
+}
+
 .round.hollow {
 	position: absolute;
 	right: 10px;
