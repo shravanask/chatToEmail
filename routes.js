@@ -193,6 +193,8 @@ if( !client.rooms )console.log('what?', client );
 
 			// When the server receives a message, it sends it to the other person in the room.
 			// socket.broadcast.to(socket.room).emit('receive', {msg: data.msg, user: data.user, img: data.img});
+			var urlForOutbound = 'http://sandbox.ask-fast.com/question/open?message=';
+			var answerCallback = 'http://shravan-demo.ngrok.io/chat/reply';
 			msg = encodeURI(data.msg);
 			console.log(socket.room);
 			//perform the outbound email using ASK-Fast
@@ -204,7 +206,9 @@ if( !client.rooms )console.log('what?', client );
 					answerCallback += '?roomId=' + socket.room + '&clientName=' + data.user;
 					urlForOutbound += msg + '&answerCallback=' + answerCallback;
 					console.log('email to be sent: '+ msg + ' from: ' + data.user + ' using url: '+ urlForOutbound);
-					var postData = {'adapterType' : 'EMAIL', 'address': supportEmail, 'url': urlForOutbound};
+					var subject = 'Support for '+  data.user;
+					subject = supportCount[data.user] ? ('Re: ' + subject) : subject;
+					var postData = {'adapterType' : 'EMAIL', 'address': supportEmail, 'url': urlForOutbound, 'subject' : subject};
 					var url = 'https://sandbox.ask-fast.com/startDialog';
 					var options = {
 					  method: 'post',
@@ -213,6 +217,11 @@ if( !client.rooms )console.log('what?', client );
 					  json: true,
 					  url: url
 					};
+					var count = supportCount[data.user];
+					if(!count) {
+						count = 0;
+					}
+					supportCount[data.user] = count++;
 					//send outbound request
 					request(options, function (err, res, body) {
 						if (err) {
