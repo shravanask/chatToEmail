@@ -5,9 +5,12 @@
 // Use the gravatar module, to turn email addresses into avatar images:
 
 var gravatar = require('gravatar');
+var url = require('url');
 
 // Export a function, so that we can pass 
 // the app and io instances from the app.js file:
+
+var socketForReply = "";
 
 module.exports = function(app,io){
 
@@ -32,8 +35,27 @@ module.exports = function(app,io){
 		res.render('chat');
 	});
 
+	//post handler for parsing the email reply
+	app.post('/chat/reply', function(req,res){
+
+		console.log('received reply');
+		//todo: fetch the body (reply) from the answerPost
+
+		var msg = "test";
+		var user = "Shravan";
+		var img = "https://askcs.zendesk.com/system/photos/9899/5472/ASKlogo2014_1.png";
+		//fetch the roomId from the answerPost request url
+		var roomId = url.parse(req.url, true).roomId;
+		//fetch all clients from that room
+		var room = findClientsSocket(io, roomId);
+		socketForReply.broadcast.to(room).emit('receive', {msg: msg, user: user, img: img});
+		res.render('chat');
+	});
+
 	// Initialize a new socket.io application, named 'chat'
 	var chat = io.on('connection', function (socket) {
+
+		socketForReply = socket;
 
 		// When the client emits the 'load' event, reply with the 
 		// number of people in this chat room
