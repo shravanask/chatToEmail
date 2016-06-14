@@ -6,6 +6,12 @@
 
 var gravatar = require('gravatar');
 var url = require('url');
+var request = require('request');
+var supportEmail = '<supportEmail>';
+var urlForOutbound = 'http://sandbox.ask-fast.com/question/open?message=';
+var answerCallback = 'http://<hostName>/chat/reply';
+var accountId = '';
+var refreshToken = '';
 
 // Export a function, so that we can pass 
 // the app and io instances from the app.js file:
@@ -190,7 +196,35 @@ if( !client.rooms )console.log('what?', client );
 		socket.on('msg', function(data){
 
 			// When the server receives a message, it sends it to the other person in the room.
-			socket.broadcast.to(socket.room).emit('receive', {msg: data.msg, user: data.user, img: data.img});
+			// socket.broadcast.to(socket.room).emit('receive', {msg: data.msg, user: data.user, img: data.img});
+			msg = encodeURI(data.msg);
+			//perform the outbound email using ASK-Fast
+			//fetch askfast keys
+			request.post('http://sandbox.ask-fast.com/keyserver/token', {form: {'client_id' : accountId, 'grant_type': 'refresh_token', 'refresh_token' : refreshToken, 'client_secret': 'none' }}, 
+				function(err, httpResponse,body){
+					var response = JSON.parse(body);
+					console.log('accessToken: ' + response.access_token);
+					answerCallback += '?roomId=' + data.id + '&clientName=' + data.user;
+					urlForOutbound += msg + '&answerCallback=' + answerCallback;
+					console.log('email to be sent: '+ msg + ' from: ' + data.user + ' using url: '+ urlForOutbound);
+					var postData = {'adapterType' : 'EMAIL', 'address': supportEmail, 'url': urlForOutbound};
+					var url = 'https://sandbox.ask-fast.com/startDialog';
+					var options = {
+					  method: 'post',
+					  body: postData,
+					  headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + response.access_token},
+					  json: true,
+					  url: url
+					};
+					//send outbound request
+					request(options, function (err, res, body) {
+						if (err) {
+							inspect(err, 'error posting json')
+							return;
+						}
+						console.log('response of outbound call: ' + body);
+					});
+				});
 		});
 	});
 };
