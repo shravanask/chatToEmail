@@ -161,13 +161,14 @@ module.exports = function(app,io){
 			// When the server receives a message, it sends it to the other person in the room.
 			// socket.broadcast.to(socket.room).emit('receive', {msg: data.msg, user: data.user, img: data.img});
 			msg = encodeURI(data.msg);
+			console.log(socket.room);
 			//perform the outbound email using ASK-Fast
 			//fetch askfast keys
 			request.post('http://sandbox.ask-fast.com/keyserver/token', {form: {'client_id' : accountId, 'grant_type': 'refresh_token', 'refresh_token' : refreshToken, 'client_secret': 'none' }}, 
 				function(err, httpResponse,body){
 					var response = JSON.parse(body);
 					console.log('accessToken: ' + response.access_token);
-					answerCallback += '?roomId=' + data.id + '&clientName=' + data.user;
+					answerCallback += '?roomId=' + socket.room + '&clientName=' + data.user;
 					urlForOutbound += msg + '&answerCallback=' + answerCallback;
 					console.log('email to be sent: '+ msg + ' from: ' + data.user + ' using url: '+ urlForOutbound);
 					var postData = {'adapterType' : 'EMAIL', 'address': supportEmail, 'url': urlForOutbound};
