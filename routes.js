@@ -41,21 +41,54 @@ module.exports = function(app,io){
 		res.render('chat');
 	});
 
-	//post handler for parsing the email reply
+
+    // post handler for parsing the email reply
+    // EG: /chat/reply?roomId=<value>
 	app.post('/chat/reply', function(req,res){
 
-		console.log('received reply');
-		//todo: fetch the body (reply) from the answerPost
+		// fetch the body (reply) from the answerPost
+        var body = '';
+        req.on('data', function(data) { body += data; });
+        req.on('end', function () {
+            // assume ask-fast dialog-object in body
+            var reply = JSON.parse(body);
 
-		var msg = "test";
-		var user = "Shravan";
-		var img = "https://askcs.zendesk.com/system/photos/9899/5472/ASKlogo2014_1.png";
-		//fetch the roomId from the answerPost request url
-		var roomId = url.parse(req.url, true).roomId;
-		//fetch all clients from that room
+            var msg = reply.answer_text;
+            var user = "Shravan";
+		    var img = "https://askcs.zendesk.com/system/photos/9899/5472/ASKlogo2014_1.png";
+		    //fetch the roomId from the answerPost request url
+		    var roomId = url.parse(req.url, true).query.roomId;
+
+if( !roomId )console.log("todo: cancel this operation");
+
+            //fetch all clients from that room
+            console.log("search in ", io.sockets.sockets.length, " sockets for room ", roomId );
+            for( var i=0 ; i < io.sockets.sockets.length; i++ )
+            {
+                var client = io.sockets.sockets[i];
+
+console.log(  "search deeper " , client.rooms );
+if( !client.rooms )console.log('what?', client );
+
+                for( var j=0; j<client.rooms.length; j++ )
+                {
+                    if( client.rooms[j] == roomId )
+                    {
+                        console.log("match! try hook send ",msg," to ", roomId );
+                        client.broadcast.to(roomId).emit('receive', {msg: msg, user: user, img: img});  // <-- this does not work
+                        break;
+                    }
+                }
+            }
+/*
 		var room = findClientsSocket(io, roomId);
 		socketForReply.broadcast.to(room).emit('receive', {msg: msg, user: user, img: img});
-		res.render('chat');
+*/
+            //what are these?
+            res.render('chat');
+            req.connection.destroy();
+        });
+
 	});
 
 	// Initialize a new socket.io application, named 'chat'
